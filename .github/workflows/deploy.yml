@@ -35,16 +35,3 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
-
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            docker pull ghcr.io/${{ github.repository }}:latest
-            docker stop ozgursozluk || true
-            docker rm ozgursozluk || true
-            docker run -d --restart=always --name ozgursozluk -p 8010:5000 ghcr.io/${{ github.repository }}:latest
