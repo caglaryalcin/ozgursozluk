@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>debe</title>
+    <title>özgürsözlük - debe</title>
     <link>{{ url_for("core.debe", _external=True) }}</link>
+    <atom:link href="{{ url_for('utility.debe_xml', _external=True) }}" rel="self" type="application/rss+xml" />
+    <description>Dünün en beğenilen entry'leri</description>
     <language>tr</language>
     {% for entry in debe %}
     <item>
       <title>{{ entry.topic_title }}</title>
       <link>{{ url_for("content.entry", id=entry.id, _external=True) }}</link>
-      <description><![CDATA[ {{ entry.content | safe }} ]]></description>
-      <pubDate>{{ entry.created }}</pubDate>
+      <guid isPermaLink="true">{{ url_for("content.entry", id=entry.id, _external=True) }}</guid>
     </item>
     {% endfor %}
   </channel>

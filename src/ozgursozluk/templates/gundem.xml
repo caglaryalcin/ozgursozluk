@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>gündem</title>
+    <title>özgürsözlük - gündem</title>
     <link>{{ url_for("core.index", _external=True) }}</link>
+    <atom:link href="{{ url_for('utility.gundem_xml', _external=True) }}" rel="self" type="application/rss+xml" />
+    <description>Ekşi Sözlük gündem</description>
     <language>tr</language>
     {% for topic in topics %}
     <item>
       <title>{{ topic.title }}</title>
-      <link>{{ url_for("content.topic", path=topic.path, a="popular", _external=True) }}</link>
-      <description>
-        <![CDATA[
-          {% for entry in topic.entrys %}
-            <p>{{ entry.content }}</p>
-            <p>-- <a href="{{ url_for('content.author', nickname=entry.author.nickname, _external=True) }}">{{ entry.author.nickname }}</a></p>
-          {% endfor %}
-        ]]>
-      </description>
-      <pubDate>{{ topic.last_entry_time }}</pubDate>
+      <link>{{ url_for("content.topic", path=topic.path, _external=True) }}</link>
+      <guid isPermaLink="true">{{ url_for("content.topic", path=topic.path, _external=True) }}</guid>
+      {% if topic.entry_count %}<description>{{ topic.entry_count }} entry</description>{% endif %}
     </item>
     {% endfor %}
   </channel>

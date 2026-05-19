@@ -104,19 +104,46 @@ def settings() -> Union[str, werkzeug.wrappers.Response]:
     )
 
 
+def _rss_response(template: str, **context) -> flask.Response:
+    response = flask.make_response(flask.render_template(template, **context))
+    response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
+    return response
+
+
 @utility_bp.route("/rss")
-def gundem_xml() -> flask.Response:
-    raise NotImplementedError()
+def gundem_xml() -> Union[flask.Response, tuple]:
+    try:
+        topics = list(limoon.get_agenda(page=1))
+    except (limoon.TopicNotFound, limoon.HTMLParsingError, UnicodeDecodeError) as e:
+        return flask.render_template("not-found.html", description=e.__doc__), 404
+
+    return _rss_response("gundem.xml", topics=topics)
 
 
 @utility_bp.route("/debe/rss")
-def debe_xml() -> flask.Response:
-    raise NotImplementedError()
+def debe_xml() -> Union[flask.Response, tuple]:
+    try:
+        debe = list(limoon.get_debe())
+    except (limoon.EntryNotFound, limoon.HTMLParsingError, UnicodeDecodeError) as e:
+        return flask.render_template("not-found.html", description=e.__doc__), 404
+
+    return _rss_response("debe.xml", debe=debe)
 
 
 @utility_bp.route("/<path>/rss")
-def topic_xml(path: str) -> flask.Response:
-    raise NotImplementedError()
+def topic_xml(path: str) -> Union[flask.Response, tuple]:
+    try:
+        topic = limoon.get_topic(path)
+    except (limoon.TopicNotFound, limoon.HTMLParsingError, UnicodeDecodeError) as e:
+        return flask.render_template("not-found.html", description=e.__doc__), 404
+
+    if getattr(topic, "page_count", 1) > 1:
+        try:
+            topic = limoon.get_topic(path, page=topic.page_count)
+        except Exception:
+            pass  # son sayfa çekilemezse (ör. rate-limit) 1. sayfaya düş; bozuk feed verme
+
+    return _rss_response("topic.xml", topic=topic)
 
 
 @utility_bp.route("/robots.txt")
@@ -141,7 +168,7 @@ def sitemap_xml() -> flask.Response:
         topic_urls = [
             {"loc": flask.url_for("content.topic", path=topic.path, _external=True)} for topic in agenda_topics
         ]
-    except (limoon.AgendaNotFound, UnicodeDecodeError):
+    except (limoon.TopicNotFound, limoon.HTMLParsingError, UnicodeDecodeError):
         topic_urls = []
 
     all_urls = static_urls + channel_urls + topic_urls

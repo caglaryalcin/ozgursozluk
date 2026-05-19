@@ -20,7 +20,7 @@ def index() -> Union[str, werkzeug.wrappers.Response]:
 
     try:
         agenda = limoon.get_agenda(page=page)
-    except (limoon.AgendaNotFound, UnicodeDecodeError) as e:
+    except (limoon.TopicNotFound, limoon.HTMLParsingError, UnicodeDecodeError) as e:
         return (
             flask.render_template("not-found.html", description=e.__doc__),
             404,
@@ -33,7 +33,7 @@ def index() -> Union[str, werkzeug.wrappers.Response]:
 def debe() -> str:
     try:
         debe = limoon.get_debe()
-    except (limoon.DebeNotFound, UnicodeDecodeError) as e:
+    except (limoon.EntryNotFound, limoon.HTMLParsingError, UnicodeDecodeError) as e:
         return (
             flask.render_template("not-found.html", description=e.__doc__),
             404,

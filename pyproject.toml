@@ -25,13 +25,32 @@ classifiers = [
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = ["flask==3.1.2", "gunicorn==23.0.0", "limoon"]
+# NOTE: this app targets limoon's git main (uses limoon.CHANNELS, get_channel,
+# get_agenda(page=...)) which is newer than any PyPI release - the bare "limoon"
+# from PyPI is too old and breaks the homepage/channels/sitemap.
+#
+# limoon hard-pins curl-adapter==1.1.0, which is broken with current curl_cffi
+# (missing Curl.clean_after_perform -> every request 500s). We CANNOT declare
+# curl-adapter>=1.2.1 here: pip's strict resolver would reject the build with
+# ResolutionImpossible (==1.1.0 vs >=1.2.1 in the same resolution). Instead it
+# must be force-upgraded in a SEPARATE pip step after install (see Dockerfile /
+# README) - an isolated upgrade only prints a harmless conflict warning.
+dependencies = [
+    "flask==3.1.2",
+    "gunicorn==23.0.0",
+    "limoon @ git+https://github.com/beucismis/limoon.git@1985807113e4c3f194928ff35fcb3b06341349e9",
+]
 
 [project.urls]
 Homepage = "https://github.com/beucismis/ozgursozluk"
 Repository = "https://github.com/beucismis/ozgursozluk"
 Changelog = "https://github.com/beucismis/ozgursozluk/releases"
 Documentation = "https://github.com/beucismis/ozgursozluk/blob/main/README.md"
+
+[tool.hatch.metadata]
+# Required because project.dependencies uses a direct git reference for limoon
+# (the app targets limoon's git main, which is newer than any PyPI release).
+allow-direct-references = true
 
 [tool.hatch.version]
 path = "src/ozgursozluk/__init__.py"

@@ -1,6 +1,6 @@
 ## ToDo
 - [x] API ~~endpoint~~
-- [ ] RSS support
+- [x] RSS support
 - [x] Docker support
 - [x] Page support for debe
 - [x] Author page and ~~last entrys~~
