@@ -10,7 +10,8 @@
     <item>
       <title>{{ entry.topic_title }}</title>
       <link>{{ url_for("content.entry", id=entry.id, _external=True) }}</link>
-      <guid isPermaLink="true">{{ url_for("content.entry", id=entry.id, _external=True) }}</guid>
+      <guid isPermaLink="false">ozgursozluk:entry:{{ entry.id }}</guid>
+      {% if entry.created %}<pubDate>{{ entry.created | rfc822_date }}</pubDate>{% endif %}
     </item>
     {% endfor %}
   </channel>

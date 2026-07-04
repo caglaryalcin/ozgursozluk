@@ -10,7 +10,7 @@
     <item>
       <title>{{ topic.title }}</title>
       <link>{{ url_for("content.topic", path=topic.path, _external=True) }}</link>
-      <guid isPermaLink="true">{{ url_for("content.topic", path=topic.path, _external=True) }}</guid>
+      <guid isPermaLink="false">ozgursozluk:topic:{{ topic.path }}</guid>
       {% if topic.entry_count %}<description>{{ topic.entry_count }} entry</description>{% endif %}
     </item>
     {% endfor %}

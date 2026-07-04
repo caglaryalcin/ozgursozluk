@@ -10,10 +10,10 @@
     <item>
       <title>{{ topic.title }} (#{{ entry.id }})</title>
       <link>{{ url_for("content.entry", id=entry.id, _external=True) }}</link>
-      <guid isPermaLink="true">{{ url_for("content.entry", id=entry.id, _external=True) }}</guid>
+      <guid isPermaLink="false">ozgursozluk:entry:{{ entry.id }}</guid>
       <dc:creator>{{ entry.author_nickname }}</dc:creator>
       <description><![CDATA[ {{ entry.html | safe }} ]]></description>
-      {% if entry.created %}<pubDate>{{ entry.created.strftime("%a, %d %b %Y %H:%M:%S +0300") }}</pubDate>{% endif %}
+      {% if entry.created %}<pubDate>{{ entry.created | rfc822_date }}</pubDate>{% endif %}
     </item>
     {% endfor %}
   </channel>

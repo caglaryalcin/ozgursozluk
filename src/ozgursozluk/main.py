@@ -1,6 +1,7 @@
 import json
 import re
-from datetime import UTC, date, datetime
+from datetime import date, datetime, timedelta, timezone
+from email.utils import format_datetime
 
 import flask
 from limoon.__about__ import __version__ as limoon_version
@@ -17,6 +18,8 @@ app.register_blueprint(core_bp)
 app.register_blueprint(content_bp)
 app.register_blueprint(utility_bp)
 app.register_blueprint(errors_bp)
+
+ISTANBUL_TIMEZONE = timezone(timedelta(hours=3))
 
 
 @app.context_processor
@@ -64,6 +67,14 @@ def replace_links(content: str) -> str:
     return content
 
 
+@app.template_filter()
+def rfc822_date(value: datetime) -> str:
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=ISTANBUL_TIMEZONE)
+
+    return format_datetime(value)
+
+
 @app.route("/api/healtcheck")
 def healtcheck() -> flask.Response:
-    return flask.jsonify(status="healthy", version=__version__, timestamp=datetime.now(UTC))
+    return flask.jsonify(status="healthy", version=__version__, timestamp=datetime.now(timezone.utc))
