@@ -6,6 +6,7 @@
     <atom:link href="{{ url_for('utility.debe_xml', _external=True) }}" rel="self" type="application/rss+xml" />
     <description>Dünün en beğenilen entry'leri</description>
     <language>tr</language>
+    <ttl>{{ rss_ttl_minutes }}</ttl>
     {% for entry in debe %}
     <item>
       <title>{{ entry.topic_title }}</title>

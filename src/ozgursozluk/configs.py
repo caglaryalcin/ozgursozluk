@@ -3,6 +3,8 @@ from os import environ
 from typing import Final
 
 SECRET_KEY: Final = environ.get("OZGURSOZLUK_SECRET_KEY", secrets.token_hex(24))
+RSS_TTL_MINUTES: Final = int(environ.get("OZGURSOZLUK_RSS_TTL_MINUTES", "15"))
+RSS_MAX_ENTRY_AGE_DAYS: Final = float(environ.get("OZGURSOZLUK_RSS_MAX_ENTRY_AGE_DAYS", "2"))
 
 THEMES: Final = [
     "Light",

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Union
 
 import flask
@@ -9,6 +9,7 @@ import werkzeug
 from .. import configs
 
 utility_bp = flask.Blueprint("utility", __name__)
+RSS_TIMEZONE = timezone(timedelta(hours=3))
 
 
 @utility_bp.route("/external/rentry")
@@ -105,9 +106,36 @@ def settings() -> Union[str, werkzeug.wrappers.Response]:
 
 
 def _rss_response(template: str, **context) -> flask.Response:
+    context.setdefault("rss_ttl_minutes", configs.RSS_TTL_MINUTES)
     response = flask.make_response(flask.render_template(template, **context))
     response.headers["Content-Type"] = "application/rss+xml; charset=utf-8"
+    response.headers["Cache-Control"] = "no-cache, max-age=0"
     return response
+
+
+def _recent_rss_entries(entries):
+    if configs.RSS_MAX_ENTRY_AGE_DAYS <= 0:
+        return list(entries or [])
+
+    cutoff = datetime.now(RSS_TIMEZONE) - timedelta(days=configs.RSS_MAX_ENTRY_AGE_DAYS)
+    recent_entries = []
+
+    for entry in entries or []:
+        created = getattr(entry, "created", None)
+
+        if not created:
+            continue
+
+        if not hasattr(created, "tzinfo"):
+            continue
+
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=RSS_TIMEZONE)
+
+        if created >= cutoff:
+            recent_entries.append(entry)
+
+    return recent_entries
 
 
 @utility_bp.route("/rss")
@@ -143,7 +171,8 @@ def topic_xml(path: str) -> Union[flask.Response, tuple]:
         except Exception:
             pass  # son sayfa çekilemezse (ör. rate-limit) 1. sayfaya düş; bozuk feed verme
 
-    return _rss_response("topic.xml", topic=topic)
+    entries = _recent_rss_entries(getattr(topic, "entrys", None))
+    return _rss_response("topic.xml", topic=topic, entries=entries)
 
 
 @utility_bp.route("/robots.txt")

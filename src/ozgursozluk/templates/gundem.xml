@@ -6,6 +6,7 @@
     <atom:link href="{{ url_for('utility.gundem_xml', _external=True) }}" rel="self" type="application/rss+xml" />
     <description>Ekşi Sözlük gündem</description>
     <language>tr</language>
+    <ttl>{{ rss_ttl_minutes }}</ttl>
     {% for topic in topics %}
     <item>
       <title>{{ topic.title }}</title>

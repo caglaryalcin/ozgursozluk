@@ -70,6 +70,8 @@ Once the service is running, you can access the API at `http://localhost:5000`.
 | `FLASK_RUN_HOST`       |  `127.0.0.1`             |
 | `FLASK_RUN_PORT`       | `5000`                   |
 | `EKSI_SOZLUK_BASE_URL` | `https://eksisozluk.com` |
+| `OZGURSOZLUK_RSS_TTL_MINUTES` | `15` |
+| `OZGURSOZLUK_RSS_MAX_ENTRY_AGE_DAYS` | `2` |
 
 ## Development
 

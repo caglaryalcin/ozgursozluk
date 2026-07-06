@@ -6,7 +6,8 @@
     <atom:link href="{{ url_for('utility.topic_xml', path=topic.path, _external=True) }}" rel="self" type="application/rss+xml" />
     <description>{{ topic.title }}</description>
     <language>tr</language>
-    {% for entry in (topic.entrys or []) | reverse %}
+    <ttl>{{ rss_ttl_minutes }}</ttl>
+    {% for entry in (entries or []) | reverse %}
     <item>
       <title>{{ topic.title }} (#{{ entry.id }})</title>
       <link>{{ url_for("content.entry", id=entry.id, _external=True) }}</link>
